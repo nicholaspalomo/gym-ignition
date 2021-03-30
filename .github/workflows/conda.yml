@@ -1,0 +1,107 @@
+name: Conda
+
+on:
+  push:
+  pull_request:
+  release:
+    types:
+      - published
+
+jobs:
+
+  build-and-test:
+    name: ${{ matrix.os }}@${{ matrix.python }}@${{ matrix.ignition }}
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash -l {0}
+    strategy:
+      fail-fast: false
+      matrix:
+        ignition:
+          - gazebo4
+          # - gazebo5
+        os:
+          - ubuntu-latest
+          # - macOS-latest
+          # - windows-latest
+        python:
+          - 3.8
+        build_type:
+          - Debug
+
+    steps:
+
+      - name: Inspect Environment
+        run: |
+          env | grep ^GITHUB
+          echo ""
+          cat ${GITHUB_EVENT_PATH}
+          echo ""
+          env
+
+      - uses: actions/checkout@master
+      - run: git fetch --prune --unshallow
+
+      - uses: conda-incubator/setup-miniconda@v2
+        with:
+          mamba-version: "*"
+          channel-priority: true
+          auto-update-conda: true
+          activate-environment: gym_ignition
+          python-version: ${{ matrix.python }}
+          channels: conda-forge,robotology,defaults
+
+      - name: Mamba info
+        run: mamba info
+
+      - name: Mamba list
+        run: mamba list
+
+      - name: Dependencies
+        run: |
+          mamba install -y cmake compilers ninja pkg-config swig pybind11 pytest
+          mamba install -y mesa-libgl-devel-cos7-x86_64
+          mamba install -y libignition-${{ matrix.ignition }}
+          mamba install -y gym scipy numpy lxml
+
+      - name: Dependencies [idyntree]
+        run: |
+          mamba install -y ipopt libxml2 eigen tinyxml assimp
+          pip install git+http://github.com/robotology/idyntree@master
+          IDYNTREE_PYTHON_PKG=$(python3 -c 'import idyntree, pathlib; print(pathlib.Path(idyntree.__file__).parent)')
+          echo "CMAKE_PREFIX_PATH=$CMAKE_PREFIX_PATH:$IDYNTREE_PYTHON_PKG" >> $GITHUB_ENV
+          echo "iDynTree_DIR=$IDYNTREE_PYTHON_PKG/lib/cmake/iDynTree" >> $GITHUB_ENV
+
+      - name: Configure [linux|macos]
+        if: contains(matrix.os, 'macos') || contains(matrix.os, 'ubuntu')
+        run: |
+          cmake \
+              -S . \
+              -B build \
+              -GNinja \
+              -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+              -DSCENARIO_USE_IGNITION:BOOL=ON \
+              -DCMAKE_INSTALL_PREFIX=${CONDA_PREFIX}
+
+      - name: Configure [windows]
+        if: contains(matrix.os, 'windows')
+        run: |
+          cmake \
+              -S . \
+              -B build/ \
+              -G"Visual Studio 16 2019" \
+              -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+              -DSCENARIO_USE_IGNITION:BOOL=ON \
+              -DCMAKE_INSTALL_PREFIX=${CONDA_PREFIX}
+
+      - name: Build
+        run: cmake --build build/ --config ${{ matrix.build_type }}
+
+      - name: Install
+        run: |
+          cmake --build build/ --target install
+          pip install -e .
+
+      - name: Test
+        run: pytest tests/
