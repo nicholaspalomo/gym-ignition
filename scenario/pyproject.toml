@@ -9,4 +9,6 @@ requires = [
 ]
 
 [tool.setuptools_scm]
+root = ".."
+relative_to = "__file__"
 local_scheme = "dirty-tag"

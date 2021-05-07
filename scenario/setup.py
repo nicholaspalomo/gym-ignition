@@ -3,7 +3,8 @@
 # GNU Lesser General Public License v2.1 or any later version.
 
 from pathlib import Path
-from setuptools import setup, find_packages
+from setuptools import setup
+from cmake_build_extension import BuildExtension, CMakeExtension
 
 # Read the contents of your README file
 this_directory = Path(__file__).absolute().parent
@@ -11,16 +12,15 @@ with open(this_directory / "README.md", encoding="utf-8") as f:
     long_description = f.read()
 
 setup(
-    name="gym-ignition",
+    name="scenario",
     author="Diego Ferigo",
     author_email="diego.ferigo@iit.it",
-    description="Gym-Ignition: A toolkit for developing OpenAI Gym environments "
-                "simulated with Ignition Gazebo.",
+    description="SCENe interfAces for Robot Input/Output.",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/robotology/gym-ignition",
-    keywords=["openai", "gym", "reinforcement learning", "rl", "environment", "gazebo",
-              "robotics", "ignition", "humanoid", "panda", "icub", "urdf", "sdf"],
+    url="https://github.com/robotology/gym-ignition/scenario",
+    keywords=["robotics", "gazebo", "ignition", "simulation", "physics", "multibody",
+              "dynamics", "physics simulation", "middleware", "real-time"],
     license="LGPL",
     platforms="any",
     classifiers=[
@@ -31,39 +31,19 @@ setup(
         "Framework :: Robot Framework",
         "Intended Audience :: Developers",
         "Intended Audience :: Science/Research",
-        "Programming Language :: Python :: 3.8",
-        "Programming Language :: Python :: 3.9",
+        "Programming Language :: C++",
         "Programming Language :: Python :: 3 :: Only",
         "License :: OSI Approved :: GNU Lesser General Public License v2 or later (LGPLv2+)",
     ],
-    use_scm_version=dict(local_scheme="dirty-tag"),
+    use_scm_version=dict(local_scheme="dirty-tag", root="..", relative_to=__file__),
     setup_requires=["setuptools_scm"],
-    python_requires=">=3.8",
-    install_requires=[
-        "scenario",
-        "gym>=0.13.1",
-        "numpy",
-        "gym_ignition_models",
-        "lxml",
-        "idyntree",
-    ],
-    extras_require=dict(
-        website=[
-            "sphinx",
-            "sphinx-book-theme<0.0.39",
-            "sphinx-autodoc-typehints",
-            "sphinx_fontawesome",
-            "sphinx-multiversion",
-            "sphinx-tabs",
-            "breathe",
-        ],
-        test=[
-            "pytest",
-            "pytest-xvfb",
-            "pytest-icdiff",
-        ]
-    ),
-    packages=find_packages("python"),
-    package_dir={"": "python"},
+    python_requires=">=3.0",
+    ext_modules=[CMakeExtension(name="ScenarioCMakeProject",
+                                source_dir=str(this_directory.parent),
+                                install_prefix="scenario",
+                                cmake_build_type="PyPI",
+                                cmake_depends_on=["idyntree"],
+                                disable_editable=True)],
+    cmdclass=dict(build_ext=BuildExtension),
     zip_safe=False,
 )
