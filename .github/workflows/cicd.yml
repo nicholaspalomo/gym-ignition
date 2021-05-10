@@ -380,6 +380,7 @@ jobs:
         with:
           path: build/html
           name: website
+          retention-days: 1
 
 # ===================
   website-deployment:
