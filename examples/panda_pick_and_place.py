@@ -43,7 +43,7 @@ def add_panda_controller(panda: gym_ignition_environments.models.panda.Panda,
     # Initialize the controller to the current state
     assert panda.set_joint_position_targets(panda.joint_positions())
     assert panda.set_joint_velocity_targets(panda.joint_velocities())
-    assert panda.set_joint_acceleration_targets(panda.joint_accelerations())
+    assert panda.set_joint_acceleration_targets(np.zeros((len(panda.joint_names())))) #panda.joint_accelerations())
 
 
 def get_panda_ik(panda: gym_ignition_environments.models.panda.Panda,
@@ -223,8 +223,8 @@ panda = gym_ignition_environments.models.panda.Panda(
     world=world, position=[-0.1, 0, 1.0])
 
 # Enable contacts only for the finger links
-panda.get_link("panda_leftfinger").to_gazebo().enable_contact_detection(True)
-panda.get_link("panda_rightfinger").to_gazebo().enable_contact_detection(True)
+panda.get_link("panda_leftfinger").enable_contact_detection(True)
+panda.get_link("panda_rightfinger").enable_contact_detection(True)
 
 # Process model insertion in the simulation
 gazebo.run(paused=True)

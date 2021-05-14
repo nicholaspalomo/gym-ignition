@@ -37,7 +37,7 @@ env = randomizers.cartpole_no_rand.CartpoleEnvNoRandomizations(env=make_env)
 #     env=make_env, seed=42, num_physics_rollouts=5)
 
 # Enable the rendering
-# env.render('human')
+env.render('human')
 
 # Initialize the seed
 env.seed(42)

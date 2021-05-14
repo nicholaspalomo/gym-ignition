@@ -41,7 +41,7 @@ setup(
         'local_scheme': 'dirty-tag',
     },
     setup_requires=['setuptools_scm'],
-    python_requires='>=3.8',
+    python_requires='>=3.6.9',
     install_requires=[
         'gym >= 0.13.1',
         'numpy',
