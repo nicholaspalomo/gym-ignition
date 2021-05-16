@@ -32,7 +32,7 @@ class BuildExtension(build_ext):
     FROM_DEST_TO_ORIG = {
         "iCubGazeboV2_5/meshes": f"{SHARED_MESH_DIR}/iCubGazeboV2_5",
         "iCubGazeboSimpleCollisionsV2_5/meshes": f"{SHARED_MESH_DIR}/iCubGazeboV2_5",
-        "spot/meshes" : "spot/meshes",
+        "spot/meshes" : f"{SHARED_MESH_DIR}/spot",
     }
 
     def run(self) -> None:
