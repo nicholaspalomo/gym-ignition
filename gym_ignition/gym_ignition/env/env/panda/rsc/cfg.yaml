@@ -3,6 +3,10 @@ record_video: true
 device: "cuda"
 
 environment:
+  step_size: 0.001
+  rtf: 1.0
+  steps_per_run: 1
+  
   render: True
   num_envs: 200
   num_threads: 40
