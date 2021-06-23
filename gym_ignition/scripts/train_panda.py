@@ -32,7 +32,7 @@ def main(args):
     # save the current training configuration
     saver = ConfigurationSaver(
         log_dir=log_path,
-        save_items=[os.join.path(__RSCDIR__, 'cfg.yaml'), os.join.path(__RSCDIR__, '..', 'Environment.hpp')]
+        save_items=[os.path.join(__RSCDIR__, 'cfg.yaml'), os.path.join(__RSCDIR__, '..', 'Environment.hpp')]
     )
 
     print('[train_panda.py] Saving log files for current training run in: {}'.format(saver.data_dir))
