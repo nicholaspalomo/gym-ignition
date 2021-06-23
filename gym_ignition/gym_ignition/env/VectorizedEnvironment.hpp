@@ -26,8 +26,8 @@ class VectorizedEnvironment {
         }
 
         ~VectorizedEnvironment() {
-            // for(auto *ptr : environments_)
-            //     delete *ptr;
+            for(auto ptr : environments_)
+                delete ptr;
         }
 
         void init() {
@@ -83,8 +83,8 @@ class VectorizedEnvironment {
         // advance the environment one step (i.e. one control_dt)
         void step(Eigen::Ref<EigenRowMajorMat>& action,
                   Eigen::Ref<EigenRowMajorMat>& ob,
-                  Eigen::Ref<EigenRowMajorMat>& reward,
-                  Eigen::Ref<EigenRowMajorMat>& done) {
+                  Eigen::Ref<EigenVec>& reward,
+                  Eigen::Ref<EigenBoolVec>& done) {
     #pragma omp parallel for schedule(dynamic)
             for(int i = 0; i < num_envs_; i++){
                 perAgentStep(i, action, ob, reward, done);
@@ -136,8 +136,8 @@ class VectorizedEnvironment {
         inline void perAgentStep(int agentId,
                                  Eigen::Ref<EigenRowMajorMat>& action,
                                  Eigen::Ref<EigenRowMajorMat>& ob,
-                                 Eigen::Ref<EigenRowMajorMat>& reward,
-                                 Eigen::Ref<EigenRowMajorMat>& done) {
+                                 Eigen::Ref<EigenVec>& reward,
+                                 Eigen::Ref<EigenBoolVec>& done)  {
             reward[agentId] = environments_[agentId]->step(action.row(agentId));
 
             float terminal_reward = 0;
