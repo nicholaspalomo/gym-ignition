@@ -26,5 +26,5 @@ PYBIND11_MODULE(_gym_ignition, m) {
         .def("getObsDim",               &VectorizedEnvironment<ENVIRONMENT>::getObsDim)
         .def("getExtraInfoDim",         &VectorizedEnvironment<ENVIRONMENT>::getExtraInfoDim)
         .def("getActionDim",            &VectorizedEnvironment<ENVIRONMENT>::getActionDim)
-        .def("getNumOfEnvs",            &VectorizedEnvironment<ENVIRONMENT>::getNumOfEnvs)
+        .def("getNumOfEnvs",            &VectorizedEnvironment<ENVIRONMENT>::getNumOfEnvs);
 }

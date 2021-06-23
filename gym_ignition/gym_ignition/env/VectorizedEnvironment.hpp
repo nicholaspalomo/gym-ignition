@@ -26,8 +26,8 @@ class VectorizedEnvironment {
         }
 
         ~VectorizedEnvironment() {
-            for(auto *ptr : environments_)
-                delete *ptr;
+            // for(auto *ptr : environments_)
+            //     delete *ptr;
         }
 
         void init() {
@@ -46,7 +46,7 @@ class VectorizedEnvironment {
             // TODO: if render_ is false, hide the Gazebo gui window. Figure out how to do this
 
             for(int i = 0; i < num_envs_; i++){
-                environment_[i]->init();
+                environments_[i]->init();
                 environments_[i]->reset();
             }
 
@@ -69,15 +69,15 @@ class VectorizedEnvironment {
         // retrieve the observation from the environment
         void observe(Eigen::Ref<EigenRowMajorMat>& ob){
     #pragma omp parallel for schedule(dynamic)
-            for(auto env : environments_)
-                env->observe(ob.row(i));
+            for(int i = 0; i < num_envs_; i++)
+                environments_[i]->observe(ob.row(i));
         }
 
         // retrieve the extra signals from the environment
         void getExtraInfo(Eigen::Ref<EigenRowMajorMat>& extraInfo){
     #pragma omp parallel for schedule(dynamic)
-            for(auto env : environments_)
-                env->getExtraInfo(extraInfo.row(i));
+            for(int i = 0; i < num_envs_; i++)
+                environments_[i]->getExtraInfo(extraInfo.row(i));
         }
 
         // advance the environment one step (i.e. one control_dt)
@@ -141,7 +141,7 @@ class VectorizedEnvironment {
             reward[agentId] = environments_[agentId]->step(action.row(agentId));
 
             float terminal_reward = 0;
-            done[agentId] = environments_[agentId]->isTerminalState(terminalReward);
+            done[agentId] = environments_[agentId]->isTerminalState(terminal_reward);
 
             if(done[agentId]) {
                 environments_[agentId]->reset();

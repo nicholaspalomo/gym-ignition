@@ -11,11 +11,15 @@
 #include <Eigen/Core>
 
 #include "yaml-cpp/yaml.h"
+#include <sdf/sdf.hh>
 
 #include <scenario/gazebo/GazeboSimulator.h>
 #include <scenario/gazebo/Joint.h>
 #include <scenario/gazebo/Model.h>
 #include <scenario/gazebo/World.h>
+#include <ignition/gazebo/ServerConfig.hh>
+#include <scenario/gazebo/utils.h>
+#include <scenario/gazebo/helpers.h>
 
 #define __IGN_MAKE_STR(x) #x
 #define _IGN_MAKE_STR(x) __IGN_MAKE_STR(x)
@@ -30,7 +34,7 @@ using EigenRowMajorMat=Eigen::Matrix<float, -1, -1, Eigen::RowMajor>;
 using EigenVec=Eigen::Matrix<float, -1, 1>;
 using EigenBoolVec=Eigen::Matrix<bool, -1, 1>;
 
-class GymIgnitionEnv(){
+class GymIgnitionEnv{
 
     public:
 
@@ -38,7 +42,7 @@ class GymIgnitionEnv(){
             resource_dir_(std::move(resourceDir)), cfg_(cfg) {
 
                 // Create the simulator
-                gazebo_ = std::make_unique(scenario::gazebo::Simulator(cfg_["step_size"], cfg_["rtf"], cfg_["steps_per_run"]))
+                gazebo_ = std::make_unique<scenario::gazebo::GazeboSimulator>(cfg_["step_size"].template as<double>(), cfg_["rtf"].template as<double>(), cfg_["steps_per_run"].template as<size_t>());
                 
                 // Initialize the simulator
                 gazebo_->initialize();
@@ -60,7 +64,7 @@ class GymIgnitionEnv(){
 
         //// Option methods to implement ////
         virtual void close() {};
-        virtual void updateExtraInfo(Eigen::Ref<EigenVec> extraInfo) {};
+        virtual void getExtraInfo(Eigen::Ref<EigenVec> extraInfo) {};
         /////////////////////////////////////
 
         int getObsDim() { return obs_dim_; }
@@ -76,16 +80,17 @@ class GymIgnitionEnv(){
             sim_dt_ = dt;
 
             sdf::Root root;
-            sdf::ElementPtr sdfElement = gazebo_->sdfElement;
-            auto errors = root.LoadSdfString(sdfElement->ToString(""));
+            sdf::ElementPtr sdfElement;
+            std::cout << "[GymIgnitionEnv.hpp] Using default empty world" << std::endl;
+            auto errors = root.LoadSdfString(scenario::gazebo::utils::getEmptyWorld());
             assert(errors.empty()); // TODO
             for (size_t worldIdx = 0; worldIdx < root.WorldCount(); ++worldIdx) {
-                if (!utils::updateSDFPhysics(root,
-                                            gazebo_->physics.dt,
-                                            gazebo_->physics.rtf,
+                if (!scenario::gazebo::utils::updateSDFPhysics(root,
+                                            dt,
+                                            cfg_["rtf"].template as<double>(),
                                             /*realTimeUpdateRate=*/-1,
                                             worldIdx)) {
-                    sError << "Failed to set physics profile" << std::endl;
+                    std::cout << "Failed to set physics profile" << std::endl;
                     throw "[GymIgnitionEnv.hpp] Fatal error.";
                 }
             }
@@ -100,6 +105,7 @@ class GymIgnitionEnv(){
         std::string resource_dir_;
         YAML::Node cfg_;
 
+        // scenario::gazebo::GazeboSimulator gazebo_;
         std::unique_ptr<scenario::gazebo::GazeboSimulator> gazebo_;
         std::shared_ptr<scenario::gazebo::World> world_;
 

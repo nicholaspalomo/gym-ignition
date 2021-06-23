@@ -45,7 +45,7 @@ class ENVIRONMENT : public GymIgnitionEnv {
 
     public:
 
-        explicit ENVIRONMENT(const std::string& resourceDir, const YAML::Node& cfg, visualizable) :
+        explicit ENVIRONMENT(const std::string& resourceDir, const YAML::Node& cfg, bool visualizable) :
             GymIgnitionEnv(resourceDir, cfg),
             distribution_(0.0, 0.2),
             visualizable_(visualizable),
@@ -59,14 +59,14 @@ class ENVIRONMENT : public GymIgnitionEnv {
             world_->setPhysicsEngine(scenario::gazebo::PhysicsEngine::Dart);
 
             // Open the GUI
-            gazebo.gui();
+            gazebo_->gui();
             std::this_thread::sleep_for(std::chrono::seconds(3));
-            gazebo.run(/*paused=*/true);
+            gazebo_->run(/*paused=*/true);
 
             // Insert the panda model
             const std::string panda_urdf = "panda/panda.urdf";
             world_->insertModel(/*modelFile=*/panda_urdf);
-            gazebo.run(/*paused=*/true);
+            gazebo_->run(/*paused=*/true);
 
             panda_ = world_->getModel(/*modelName=*/"panda");
 
@@ -94,9 +94,9 @@ class ENVIRONMENT : public GymIgnitionEnv {
 
         }
 
-        void step(const Eigen::Ref<EigenVec>& action) final {
+        float step(const Eigen::Ref<EigenVec>& action) final {
 
-            return 1; // dummy value
+            return 1.0f; // dummy value
         }
 
         bool isTerminalState(float& terminalReward) final {
@@ -105,8 +105,8 @@ class ENVIRONMENT : public GymIgnitionEnv {
             return false; // dummy value
         }
 
-        void updateExtraInfo(Eigen::Ref<EigenVec> extraInfo) {
-            
+        void getExtraInfo(Eigen::Ref<EigenVec> extraInfo) {
+
         }
 
         void setSeed(int seed) final {

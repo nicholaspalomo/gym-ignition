@@ -86,3 +86,6 @@ setup(
     include_package_data=True,
     zip_safe=False,
 )
+
+# To build the code:
+# python3 setup.py install --CMAKE_PREFIX_PATH $IGN_GAZEBO_SYSTEM_PLUGIN_PATH
