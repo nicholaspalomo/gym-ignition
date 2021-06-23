@@ -56,11 +56,11 @@ class GymIgnitionEnv(){
         virtual void observe(Eigen::Ref<EigenVec> ob) = 0;
         virtual float step(const Eigen::Ref<EigenVec>& action) = 0;
         virtual bool isTerminalState(float& terminalReward) = 0;
-        virtual void updateExtraInfo(Eigen::Ref<EigenVec> extraInfo) {};
         ////////////////////////////////////////////////////////////
 
         //// Option methods to implement ////
         virtual void close() {};
+        virtual void updateExtraInfo(Eigen::Ref<EigenVec> extraInfo) {};
         /////////////////////////////////////
 
         int getObsDim() { return obs_dim_; }
