@@ -8,7 +8,7 @@ environment:
   steps_per_run: 1
 
   render: True
-  num_envs: 1
+  num_envs: 5
   num_threads: 40
   seed: 1
   simulation_dt: 0.004

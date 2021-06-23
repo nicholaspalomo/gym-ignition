@@ -59,7 +59,8 @@ class ENVIRONMENT : public GymIgnitionEnv {
             world_->setPhysicsEngine(scenario::gazebo::PhysicsEngine::Dart);
 
             // Open the GUI
-            gazebo_->gui();
+            if(visualizable)
+                gazebo_->gui();
             std::this_thread::sleep_for(std::chrono::seconds(3));
             gazebo_->run(/*paused=*/true);
 
