@@ -28,6 +28,9 @@ int main(int argc, char* argv[])
     const std::string groundPlaneSDF = "ground_plane/ground_plane.sdf";
     world->insertModel(groundPlaneSDF);
 
+    // const std::string pandaURDF = "panda/panda.urdf";
+    // world->insertModel(pandaURDF);
+
     // Select the physics engine
     world->setPhysicsEngine(scenario::gazebo::PhysicsEngine::Dart);
 
