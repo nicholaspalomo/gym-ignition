@@ -74,7 +74,7 @@ class VectorizedEnvironment {
         }
 
         // retrieve the extra signals from the environment
-        void observe(Eigen::Ref<EigenRowMajorMat>& extraInfo){
+        void getExtraInfo(Eigen::Ref<EigenRowMajorMat>& extraInfo){
     #pragma omp parallel for schedule(dynamic)
             for(auto env : environments_)
                 env->getExtraInfo(extraInfo.row(i));
@@ -116,7 +116,7 @@ class VectorizedEnvironment {
             env->setControlTimeStep(dt);
         }
 
-        int getObDim() { return obs_dim_; }
+        int getObsDim() { return obs_dim_; }
         int getExtraInfoDim() { return extra_info_dim_; }
         int getActionDim() { return action_dim_; }
         int getNumOfEnvs() { return num_envs_; }
