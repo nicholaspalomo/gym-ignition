@@ -13,12 +13,13 @@ from _gym_ignition import GymIgnitionEnv
 from gym_ignition.helper.helpers import ConfigurationSaver
 
 import gym_ignition.algo.ppo.module as ppo_module
-import gym_ignition.algo.ppo.module as PPO
+import gym_ignition.algo.ppo.ppo as PPO
 
 def main(args):
 
     # directories
     root = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
+    __RSCDIR__ =  os.path.join(root, 'gym_ignition', 'env', 'env', 'panda', 'rsc') # TODO: fix the import statement above so that the __RSCDIR__ is not on the install path
     log_path = os.path.join(root, 'data', 'Panda')
 
     cfg = YAML().load(open(os.path.join(__RSCDIR__, 'cfg.yaml'), 'r'))

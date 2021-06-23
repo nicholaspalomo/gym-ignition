@@ -4,23 +4,22 @@
 
 import numpy as np
 import os
+import gym
+from typing import Optional, Union, List, Iterable, Type
 from gym import spaces
 from stable_baselines3.common.vec_env import VecEnv
+VecEnvIndices = Union[None, int, Iterable[int]]
 
 class GymIgnitionVecEnv(VecEnv):
     def __init__(self, impl, clip_obs=10.0):
         self.wrapper = impl
         self.wrapper.init()
-        
-        self.num_obs = self.wrapper.getObsDim()
-        self.num_acts = self.wrapper.getActionDim()
-        self.num_extras = self.wrapper.getExtraInfoDim()
 
         self._observation_space = spaces.Box(np.ones(self.num_obs) * -np.Inf, np.ones(self.num_obs) * np.Inf)
         self._action_space = spaces.Box(np.ones(self.num_acts) * -1., np.ones(self.num_acts) * 1., dtype=np.float32)
 
         self._observation = np.zeros([self.num_envs, self.num_obs], dtype=np.float32)
-        self._extraInfo = np.zeros([self.num_envs, len(self._extraInfoNames)], dtype=np.float32)
+        self._extraInfo = np.zeros([self.num_envs, self.num_extras], dtype=np.float32)
         self._reward = np.zeros(self.num_envs, dtype=np.float32)
         self._done = np.zeros((self.num_envs), dtype=np.bool)
 
@@ -59,6 +58,12 @@ class GymIgnitionVecEnv(VecEnv):
 
     def close(self):
         self.wrapper.close()
+
+    def seed(self, seed: Optional[int] = None) -> List[Union[None, int]]:
+        raise RuntimeError('This method is not implemented')
+
+    def env_is_wrapped(self, wrapper_class: Type[gym.Wrapper], indices: VecEnvIndices = None) -> List[bool]:
+        raise RuntimeError('This method is not implemented')
 
     def step_async(self):
         raise RuntimeError('This method is not implemented')
@@ -102,11 +107,15 @@ class GymIgnitionVecEnv(VecEnv):
 
     @property
     def num_obs(self):
-        return self.num_obs
+        return self.wrapper.getObsDim()
 
     @property
     def num_acts(self):
-        return self.num_acts
+        return self.wrapper.getActionDim()
+
+    @property
+    def num_extras(self):
+        return self.wrapper.getExtraInfoDim()
 
     @property
     def observation_space(self):
